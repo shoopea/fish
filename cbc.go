@@ -66,6 +66,10 @@ func (cbc *cbc) decrypt(msg string) (string, error) {
 	}
 	decoded = bytes.TrimRight(decoded, "\x00")
 
+	// Calculate the number of padding bytes needed to match the blocksize and apply
+	padding := (blowfish.BlockSize - (len(decoded) % blowfish.BlockSize)) % blowfish.BlockSize
+	decoded = append(decoded, make([]byte, padding)...)	
+
 	decrypted := make([]byte, len(decoded))
 	cbc.decrypter.CryptBlocks(decrypted, decoded)
 	decrypted = bytes.TrimRight(decrypted, "\x00")
